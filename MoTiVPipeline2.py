@@ -16,8 +16,8 @@ from sklearn.impute import SimpleImputer
 df = pd.read_csv('9FINAL_DATASET_TRANSLATED.csv')
 df = df.dropna(subset=['worthwhileness_rating'])
 
-# 2. FEATURE ENGINEERING & SELECTION
-# Drop identifiers and "leaky" psychological variables
+# 2. FEATURE ENGINEERING & SELECTION. TAKE OUT NON RELEVANT FEATURES
+
 X = df.drop(columns=[
     'legid', 'userid', 'tripid', 'motid', 'class', 
     'sentiment_skipped', 'worthwhileness_rating',
@@ -40,7 +40,7 @@ categorical_features = [
     'years_of_residence_household'
 ]
 
-# Ensure types are correct for XGBoost native categorical support
+# Ensure types are correct 
 for col in categorical_features:
     if col in X.columns:
         X[col] = X[col].astype('category')
@@ -51,7 +51,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 # Calculate weights to balance the classes (fixes the "always predict 4" bias)
 weights = compute_sample_weight(class_weight='balanced', y=y_train)
 
-# 4. TRAIN XGBOOST MODEL
+# 4. TRAIN XGBOOST MODEL. (POISSONG was reccomended)
 print("Training Balanced XGBoost Model...")
 xgb_model = xgb.XGBRegressor(
     objective='count:poisson', 
@@ -104,3 +104,5 @@ fig, ax = plt.subplots(figsize=(10, 8))
 ConfusionMatrixDisplay.from_predictions(y_test, y_pred_rounded, cmap='Greens', normalize='true', ax=ax)
 plt.title('Balanced XGBoost Confusion Matrix (Sensitivity Improved)')
 plt.show()
+
+#Hi
